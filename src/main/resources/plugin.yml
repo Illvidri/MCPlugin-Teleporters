@@ -1,0 +1,4 @@
+name: Teleporters
+version: '${project.version}'
+main: io.github.illvidri.teleporters.Teleporters
+api-version: '1.20'
