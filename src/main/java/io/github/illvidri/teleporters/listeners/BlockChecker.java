@@ -6,6 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
+import org.bukkit.util.Vector;
 import org.joml.Vector3d;
 import org.bukkit.block.Block;
 
@@ -65,11 +66,29 @@ public class BlockChecker implements Listener {
             // Put random debugging nonsense here:
             loc = player.getLocation();
             loc.setY(loc.getY()-1);
+            //player.sendMessage(loc.getBlock().getBlockData().toString());
         }
     }
 
     public Vector3d BlockCalculator(Player player) { // This method will calculate the target coordinates given by the teleporter construction
         final Location playerloc = player.getLocation();
-        return new Vector3d(playerloc.getX(),Math.round(playerloc.getY())+0.2,playerloc.getZ());
+        Location blockloc = new Location(playerloc.getWorld(), playerloc.getX(), playerloc.getY()-1, playerloc.getZ());
+        Location temp = blockloc;
+
+        double xcoord = 0;
+        double ycoord = 0;
+        double zcoord = 0;
+
+        String[] NorthBlocks = new String[6];
+        temp.setZ(blockloc.getZ()-1);
+        for(int i = 0; i < 6; i++) {
+            temp.setY(temp.getY()-1);
+            NorthBlocks[i] = temp.getBlock().getType().toString();
+        }
+        for(String i : NorthBlocks) {
+            player.sendMessage(i);
+        }
+        player.sendMessage(NorthBlocks.length+"");
+        return new Vector3d(playerloc.getX(),77,playerloc.getZ()-5);
     }
 }
