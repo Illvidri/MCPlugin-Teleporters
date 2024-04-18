@@ -1,4 +1,4 @@
-# Minecraft Plugin: Teleporters | Latest Version 0.0.1
+# Minecraft Plugin: Teleporters | Latest Version: 0.0.1a
 ### Made by Illvidri
 </br>
 
