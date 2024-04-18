@@ -10,6 +10,68 @@ The coordinates can be input using stained glass blocks in the correct configura
 There are two settings for the large teleporters: Absolute coordinate teleportation; Relative coordinate teleportation.
 </br>
 
+Teleporter Construction:
+The Core:
+light block (Beacon, Sea Lantern, Glowstone, Redstone Lamp, Shroomlight, Froglight)
+Lodestone
+Redstone Block
+Downwards Facing Piston
+Hopper
+Crying Obsidian
+Cut Copper Slab (Can not be waxed, and can not be oxidized)
+
+Coordinate Determiners:
+It is in base 16, so pull up a calculator if you aren't used to converting from b10 to b16
+
+0 - Tinted Glass (Represents Negative Coordinates and Boolean value `False`)
+
+1 - Black Stained Glass
+
+2 - Gray Stained Glass
+
+3 - Light Gray Stained Glass
+
+4 - White Stained Glass
+
+5 - Purple Stained Glass
+
+6 - Magenta Stained Glass
+
+7 - Blue Stained Glass
+
+8 - Light Blue Stained Glass
+
+9 - Cyan Stained Glass
+
+A - Green Stained Glass
+
+B - Lime Stained Glass
+
+C - Yellow Stained Glass
+
+D - Orange Stained Glass
+
+E - Red Stained Glass
+
+F - Glass (Represents Positive Coordinates and Boolean value `True`)
+
+Random - Air (Represents a small random value; not recommended unless as a trap)
+
+Example: 0x4A6 (White, Green, Magenta) = 1190
+
+The `x` coordinate blocks are placed on the East side
+
+The `y` coordinate blocks are placed on the West side
+
+The `z` coordinate blocks are placed on the South side
+
+Additional setting blocks are placed on the North side
+
+The topmost block representing the coordinates is for the sign block (+/-)
+
+Possible Settings:
+Teleportation Type: Relative, Absolute
+
 ### Compatibilities:
 | Plugin Version | Minecraft Versions |
 | -------------- | ------------------ |

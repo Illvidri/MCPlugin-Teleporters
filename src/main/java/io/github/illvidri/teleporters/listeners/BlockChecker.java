@@ -1,12 +1,13 @@
 package io.github.illvidri.teleporters.listeners;
 
+import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
-import org.bukkit.block.data.Lightable;
 import org.joml.Vector3d;
+import org.bukkit.block.Block;
 
 
 public class BlockChecker implements Listener {
@@ -17,7 +18,7 @@ public class BlockChecker implements Listener {
             "PISTON",
             "PISTON_HEAD",
             "HOPPER",
-            "BEACON",
+            "CRYING_OBSIDIAN",
             "CUT_COPPER_SLAB"
     };
 
@@ -29,45 +30,46 @@ public class BlockChecker implements Listener {
         int checkCount = 0;
         for (String s : teleporterArrangement) {
             loc.setY(loc.getY() - 1); // Check the next block down
-            String block = loc.getBlock().getType().toString();
+            Block block = loc.getBlock();
+            String blockname = block.getType().toString();
 
-            if (block.equals(s)) checkCount++; // Count if the block matches the corresponding spot in the list
+            if (blockname.equals(s)) checkCount++; // Count if the block matches the corresponding spot in the list
             else if (s.equals("LIGHT")) {
-                try { // Try statement is because not all blocks are of the "Lightable" type and may create errors when checking
-                    if (block.equals("REDSTONE_LAMP")
-                            && ((Lightable) loc.getBlock().getBlockData()).isLit())
-                        checkCount++; // Count if the light block is a lit redstone lamp
-
-                    else if (block.equals("BEACON")
-                            || block.equals("SEA_LANTERN")
-                            || block.equals("GLOWSTONE")
-                            || block.equals("SHROOMLIGHT")
-                            || block.equals("OCHRE_FROGLIGHT")
-                            || block.equals("VERDANT_FROGLIGHT")
-                            || block.equals("PEARLESCENT_FROGLIGHT")
-                    ) checkCount++; // Count if the light block is any other light block
-                }
-                catch (Exception ignored) {} // There is no point in returning anything if the block is not a lightable block
+                if (block.getLightLevel() == 15
+                        && (blockname.equals("BEACON")
+                        || blockname.equals("SEA_LANTERN")
+                        || blockname.equals("GLOWSTONE")
+                        || blockname.equals("REDSTONE_LAMP")
+                        || blockname.equals("SHROOMLIGHT")
+                        || blockname.equals("OCHRE_FROGLIGHT")
+                        || blockname.equals("VERDANT_FROGLIGHT")
+                        || blockname.equals("PEARLESCENT_FROGLIGHT")
+                        || blockname.equals("COPPER_BULB"))
+                ) checkCount++; // Count if the light block is of the above
             }
         }
 
         if(checkCount == teleporterArrangement.length) {
             // Put activation conditions here:
-            player.sendMessage("Valid Teleporter");
+            // player.sendMessage("Valid Teleporter");
             System.out.println();
             player.teleport(new Location(player.getWorld(),
                     BlockCalculator(player).x,
                     BlockCalculator(player).y,
-                    BlockCalculator(player).z)
+                    BlockCalculator(player).z,
+                    player.getLocation().getYaw(),
+                    player.getLocation().getPitch())
             );
         }
         else {
             // Put random debugging nonsense here:
-
+            loc = player.getLocation();
+            loc.setY(loc.getY()-1);
         }
     }
 
     public Vector3d BlockCalculator(Player player) { // This method will calculate the target coordinates given by the teleporter construction
-        return new Vector3d(1,2,3);
+        final Location playerloc = player.getLocation();
+        return new Vector3d(playerloc.getX(),Math.round(playerloc.getY())+0.2,playerloc.getZ());
     }
 }
