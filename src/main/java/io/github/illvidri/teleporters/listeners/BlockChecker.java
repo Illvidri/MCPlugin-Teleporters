@@ -23,6 +23,46 @@ public class BlockChecker implements Listener {
             "CUT_COPPER_SLAB"
     };
 
+    enum hexblockencoder {
+        @SuppressWarnings({"unused"})
+        TINTED_GLASS("0"),
+        @SuppressWarnings({"unused"})
+        BLACK_STAINED_GLASS("1"),
+        @SuppressWarnings({"unused"})
+        GRAY_STAINED_GLASS("2"),
+        @SuppressWarnings({"unused"})
+        LIGHT_GRAY_STAINED_GLASS("3"),
+        @SuppressWarnings({"unused"})
+        WHITE_STAINED_GLASS("4"),
+        @SuppressWarnings({"unused"})
+        PURPLE_STAINED_GLASS("5"),
+        @SuppressWarnings({"unused"})
+        MAGENTA_STAINED_GLASS("6"),
+        @SuppressWarnings({"unused"})
+        BLUE_STAINED_GLASS("7"),
+        @SuppressWarnings({"unused"})
+        LIGHT_BLUE_STAINED_GLASS("8"),
+        @SuppressWarnings({"unused"})
+        CYAN_STAINED_GLASS("9"),
+        @SuppressWarnings({"unused"})
+        GREEN_STAINED_GLASS("A"),
+        @SuppressWarnings({"unused"})
+        LIME_STAINED_GLASS("B"),
+        @SuppressWarnings({"unused"})
+        YELLOW_STAINED_GLASS("C"),
+        @SuppressWarnings({"unused"})
+        ORANGE_STAINED_GLASS("D"),
+        @SuppressWarnings({"unused"})
+        RED_STAINED_GLASS("E"),
+        @SuppressWarnings({"unused"})
+        GLASS("F")
+
+        ;final String val;
+        hexblockencoder(String val) {
+            this.val = val;
+        }
+    }
+
     @EventHandler
     public void validTeleportChecker(PlayerMoveEvent event) {
         Player player = event.getPlayer();
@@ -53,11 +93,12 @@ public class BlockChecker implements Listener {
         if(checkCount == teleporterArrangement.length) {
             // Put activation conditions here:
             // player.sendMessage("Valid Teleporter");
-            System.out.println();
+            Vector3d teleportpos = BlockCalculator(player);
+            player.sendMessage("Teleported");
             player.teleport(new Location(player.getWorld(),
-                    BlockCalculator(player).x,
-                    BlockCalculator(player).y,
-                    BlockCalculator(player).z,
+                    teleportpos.x,
+                    teleportpos.y,
+                    teleportpos.z,
                     player.getLocation().getYaw(),
                     player.getLocation().getPitch())
             );
@@ -72,23 +113,78 @@ public class BlockChecker implements Listener {
 
     public Vector3d BlockCalculator(Player player) { // This method will calculate the target coordinates given by the teleporter construction
         final Location playerloc = player.getLocation();
-        Location blockloc = new Location(playerloc.getWorld(), playerloc.getX(), playerloc.getY()-1, playerloc.getZ());
-        Location temp = blockloc;
+        Location temp;
 
-        double xcoord = 0;
-        double ycoord = 0;
-        double zcoord = 0;
+        int xcoord = 0;
+        int ycoord = 0;
+        int zcoord = 0;
+        StringBuilder xenccoord, yenccoord, zenccoord, settingsval;
+        xenccoord = new StringBuilder();
+        yenccoord = new StringBuilder();
+        zenccoord = new StringBuilder();
+        settingsval = new StringBuilder();
 
-        String[] NorthBlocks = new String[6];
-        temp.setZ(blockloc.getZ()-1);
+        temp = new Location(playerloc.getWorld(), playerloc.getX(), playerloc.getY()-1, playerloc.getZ()-1);
         for(int i = 0; i < 6; i++) {
             temp.setY(temp.getY()-1);
-            NorthBlocks[i] = temp.getBlock().getType().toString();
+            try {
+                settingsval.append(hexblockencoder.valueOf(temp.getBlock().getType().toString()).val);
+            }
+            catch (Exception e) {settingsval.append("-");}
         }
-        for(String i : NorthBlocks) {
-            player.sendMessage(i);
+
+        temp = new Location(playerloc.getWorld(), playerloc.getX()+1, playerloc.getY()-1, playerloc.getZ());
+        for(int i = 0; i < 6; i++) {
+            temp.setY(temp.getY()-1);
+            try {
+                xenccoord.insert(0, hexblockencoder.valueOf(temp.getBlock().getType().toString()).val);
+            }
+            catch (Exception ignore) {}
         }
-        player.sendMessage(NorthBlocks.length+"");
+
+        temp = new Location(playerloc.getWorld(), playerloc.getX(), playerloc.getY()-1, playerloc.getZ()+1);
+        for(int i = 0; i < 6; i++) {
+            temp.setY(temp.getY()-1);
+            try {
+                yenccoord.insert(0, hexblockencoder.valueOf(temp.getBlock().getType().toString()).val);
+            }
+            catch (Exception ignore) {}
+        }
+
+        temp = new Location(playerloc.getWorld(), playerloc.getX()-1, playerloc.getY()-1, playerloc.getZ());
+        for(int i = 0; i < 6; i++) {
+            temp.setY(temp.getY()-1);
+            try {
+                zenccoord.insert(0, hexblockencoder.valueOf(temp.getBlock().getType().toString()).val);
+            }
+            catch (Exception ignore) {}
+        }
+
+        if(settingsval.substring(0,1).equals("0")) {
+            xcoord = -1;
+        } else if (settingsval.substring(0,1).equals("F")) {
+            xcoord = 1;
+        }
+
+        if(settingsval.substring(1,2).equals("0")) {
+            ycoord = -1;
+        } else if (settingsval.substring(1,2).equals("F")) {
+            ycoord = 1;
+        }
+
+        if(settingsval.substring(2,3).equals("0")) {
+            zcoord = -1;
+        } else if (settingsval.substring(2,3).equals("F")) {
+            zcoord = 1;
+        }
+
+        try {
+            xcoord *= Integer.parseInt(xenccoord.toString(), 16);
+            ycoord *= Integer.parseInt(yenccoord.toString(), 16);
+            zcoord *= Integer.parseInt(zenccoord.toString(), 16);
+        }
+        catch(Exception ignored) {}
+        player.sendMessage("("+xcoord+", "+ycoord+", "+zcoord+")");
         return new Vector3d(playerloc.getX(),77,playerloc.getZ()-5);
     }
 }

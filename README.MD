@@ -55,22 +55,23 @@ E - Red Stained Glass
 
 F - Glass (Represents Positive Coordinates and Boolean value `True`)
 
-Random - Air (Represents a small random value; not recommended unless as a trap)
-
-Example: 0x4A6 (White, Green, Magenta) = 1190
+Example: 0x4A6 (White, Green, Magenta (Bottom to Top)) = 1190
 
 The `x` coordinate blocks are placed on the East side
 
-The `y` coordinate blocks are placed on the West side
+The `y` coordinate blocks are placed on the South side
 
-The `z` coordinate blocks are placed on the South side
+The `z` coordinate blocks are placed on the West side
 
 Additional setting blocks are placed on the North side
 
-The topmost block representing the coordinates is for the sign block (+/-)
-
 Possible Settings:
-Teleportation Type: Relative, Absolute
+
+First Block: x-Coordinate sign: Positive or Negative
+First Block: y-Coordinate sign: Positive or Negative
+First Block: z-Coordinate sign: Positive or Negative
+
+Fifth Block: Teleportation Type: Relative, Absolute
 
 ### Compatibilities:
 | Plugin Version | Minecraft Versions |
