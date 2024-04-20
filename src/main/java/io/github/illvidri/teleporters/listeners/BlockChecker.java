@@ -3,6 +3,7 @@ package io.github.illvidri.teleporters.listeners;
 import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
@@ -22,6 +23,8 @@ public class BlockChecker implements Listener {
             "CRYING_OBSIDIAN",
             "CUT_COPPER_SLAB"
     };
+
+    final int CoordinateSize = 6;
 
     enum hexblockencoder {
         @SuppressWarnings({"unused"})
@@ -63,11 +66,16 @@ public class BlockChecker implements Listener {
         }
     }
 
-    @EventHandler
-    public void validTeleportChecker(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        Location loc = player.getLocation();
 
+
+    @EventHandler
+    public void playerMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        TeleportChecker(player);
+    }
+
+    public void TeleportChecker(Player player) {
+        Location loc = player.getLocation();
         int checkCount = 0;
         for (String s : teleporterArrangement) {
             loc.setY(loc.getY() - 1); // Check the next block down
@@ -92,22 +100,24 @@ public class BlockChecker implements Listener {
 
         if(checkCount == teleporterArrangement.length) {
             // Put activation conditions here:
-            // player.sendMessage("Valid Teleporter");
-            Vector3d teleportpos = BlockCalculator(player);
-            player.sendMessage("Teleported");
-            player.teleport(new Location(player.getWorld(),
-                    teleportpos.x,
-                    teleportpos.y,
-                    teleportpos.z,
-                    player.getLocation().getYaw(),
-                    player.getLocation().getPitch())
-            );
+            try {
+                Vector3d teleportpos = BlockCalculator(player);
+                //player.sendMessage("Teleported"); // Teleportation Debugging
+                player.teleport(new Location(player.getWorld(),
+                        teleportpos.x,
+                        teleportpos.y,
+                        teleportpos.z,
+                        player.getLocation().getYaw(),
+                        player.getLocation().getPitch())
+                );
+            }
+            catch(RuntimeException ignored) {}
         }
         else {
             // Put random debugging nonsense here:
             loc = player.getLocation();
             loc.setY(loc.getY()-1);
-            //player.sendMessage(loc.getBlock().getBlockData().toString());
+            //player.sendMessage(hexblockencoder.valueOf("AIR").toString());
         }
     }
 
@@ -115,9 +125,9 @@ public class BlockChecker implements Listener {
         final Location playerloc = player.getLocation();
         Location temp;
 
-        int xcoord = 0;
-        int ycoord = 0;
-        int zcoord = 0;
+        double xcoord = 0;
+        double ycoord = 0;
+        double zcoord = 0;
         StringBuilder xenccoord, yenccoord, zenccoord, settingsval;
         xenccoord = new StringBuilder();
         yenccoord = new StringBuilder();
@@ -125,7 +135,7 @@ public class BlockChecker implements Listener {
         settingsval = new StringBuilder();
 
         temp = new Location(playerloc.getWorld(), playerloc.getX(), playerloc.getY()-1, playerloc.getZ()-1);
-        for(int i = 0; i < 6; i++) {
+        for(int i = 0; i < CoordinateSize; i++) {
             temp.setY(temp.getY()-1);
             try {
                 settingsval.append(hexblockencoder.valueOf(temp.getBlock().getType().toString()).val);
@@ -133,32 +143,9 @@ public class BlockChecker implements Listener {
             catch (Exception e) {settingsval.append("-");}
         }
 
-        temp = new Location(playerloc.getWorld(), playerloc.getX()+1, playerloc.getY()-1, playerloc.getZ());
-        for(int i = 0; i < 6; i++) {
-            temp.setY(temp.getY()-1);
-            try {
-                xenccoord.insert(0, hexblockencoder.valueOf(temp.getBlock().getType().toString()).val);
-            }
-            catch (Exception ignore) {}
-        }
-
-        temp = new Location(playerloc.getWorld(), playerloc.getX(), playerloc.getY()-1, playerloc.getZ()+1);
-        for(int i = 0; i < 6; i++) {
-            temp.setY(temp.getY()-1);
-            try {
-                yenccoord.insert(0, hexblockencoder.valueOf(temp.getBlock().getType().toString()).val);
-            }
-            catch (Exception ignore) {}
-        }
-
-        temp = new Location(playerloc.getWorld(), playerloc.getX()-1, playerloc.getY()-1, playerloc.getZ());
-        for(int i = 0; i < 6; i++) {
-            temp.setY(temp.getY()-1);
-            try {
-                zenccoord.insert(0, hexblockencoder.valueOf(temp.getBlock().getType().toString()).val);
-            }
-            catch (Exception ignore) {}
-        }
+        fillencodedstring(new Location(playerloc.getWorld(), playerloc.getX()+1, playerloc.getY()-1, playerloc.getZ()), xenccoord);
+        fillencodedstring(new Location(playerloc.getWorld(), playerloc.getX(), playerloc.getY()-1, playerloc.getZ()+1), yenccoord);
+        fillencodedstring(new Location(playerloc.getWorld(), playerloc.getX()-1, playerloc.getY()-1, playerloc.getZ()), zenccoord);
 
         if(settingsval.substring(0,1).equals("0")) {
             xcoord = -1;
@@ -184,7 +171,32 @@ public class BlockChecker implements Listener {
             zcoord *= Integer.parseInt(zenccoord.toString(), 16);
         }
         catch(Exception ignored) {}
-        player.sendMessage("("+xcoord+", "+ycoord+", "+zcoord+")");
-        return new Vector3d(playerloc.getX(),77,playerloc.getZ()-5);
+
+        if(settingsval.substring(4,5).equals("F")) {
+            xcoord += playerloc.getX();
+            ycoord += playerloc.getY();
+            zcoord += playerloc.getZ();
+        } else if (!settingsval.substring(4,5).equals("0")) {
+            xcoord = 0;
+            ycoord = 0;
+            zcoord = 0;
+        }
+
+        if(!settingsval.substring(5,6).equals("F")) {
+            throw new RuntimeException("Teleporter not active");
+        }
+
+        //player.sendMessage("("+xcoord+", "+ycoord+", "+zcoord+")"); // Coordinate Debugging
+        return new Vector3d(xcoord,ycoord,zcoord);
+    }
+
+    void fillencodedstring(Location loc, StringBuilder target) {
+        for(int i = 0; i < CoordinateSize; i++) {
+            loc.setY(loc.getY()-1);
+            try {
+                target.insert(0, hexblockencoder.valueOf(loc.getBlock().getType().toString()).val);
+            }
+            catch (Exception e) { throw new RuntimeException("Invalid Block Detected"); }
+        }
     }
 }

@@ -67,11 +67,15 @@ Additional setting blocks are placed on the North side
 
 Possible Settings:
 
-First Block: x-Coordinate sign: Positive or Negative
+First Block: x-Coordinate sign: Positive (Glass) or Negative (Tinted Glass); Any other block cancels the value
+
 First Block: y-Coordinate sign: Positive or Negative
+
 First Block: z-Coordinate sign: Positive or Negative
 
-Fifth Block: Teleportation Type: Relative, Absolute
+Fifth Block: Teleportation Type: Relative (Glass) or Absolute (Tinted Glass)
+
+Sixth Block: Activity: Glass is active; Any other block is inactive
 
 ### Compatibilities:
 | Plugin Version | Minecraft Versions |
