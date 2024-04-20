@@ -69,9 +69,9 @@ Possible Settings:
 
 First Block: x-Coordinate sign: Positive (Glass) or Negative (Tinted Glass); Any other block cancels the value
 
-First Block: y-Coordinate sign: Positive or Negative
+Second Block: y-Coordinate sign: Positive or Negative
 
-First Block: z-Coordinate sign: Positive or Negative
+Third Block: z-Coordinate sign: Positive or Negative
 
 Fifth Block: Teleportation Type: Relative (Glass) or Absolute (Tinted Glass)
 
