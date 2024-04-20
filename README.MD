@@ -10,7 +10,7 @@ The coordinates can be input using stained glass blocks in the correct configura
 There are two settings for the large teleporters: Absolute coordinate teleportation; Relative coordinate teleportation.
 </br>
 
-Teleporter Construction:
+Teleporter Construction (Pictures yet to be added):
 The Core:
 light block (Beacon, Sea Lantern, Glowstone, Redstone Lamp, Shroomlight, Froglight)
 Lodestone
