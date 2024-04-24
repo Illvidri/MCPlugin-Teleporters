@@ -22,6 +22,29 @@ public class BlockChecker implements Listener {
             "CUT_COPPER_SLAB"
     };
 
+    enum elevatorPowerSources {
+        @SuppressWarnings({"unused"})
+        LAVA_CAULDRON,
+        @SuppressWarnings({"unused"})
+        REDSTONE_BLOCK,
+        @SuppressWarnings({"unused"})
+        REDSTONE_TORCH,
+        @SuppressWarnings({"unused"})
+        REDSTONE_LAMP,
+        @SuppressWarnings({"unused"})
+        COPPER_BULB,
+        @SuppressWarnings({"unused"})
+        WAXED_COPPER_BULB;
+        public static boolean contains(String val) {
+            try {
+                lights.valueOf(val);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+    }
+
     enum lights {
         @SuppressWarnings({"unused"})
         BEACON,
@@ -93,6 +116,8 @@ public class BlockChecker implements Listener {
         }
     }
 
+    enum TeleporterType {LARGE, ELEVATOR};
+
     @EventHandler
     public void playerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
@@ -103,6 +128,10 @@ public class BlockChecker implements Listener {
     public void playerClick(PlayerInteractEvent event) {
         if(event.getAction()==Action.RIGHT_CLICK_BLOCK) {
             Player player = event.getPlayer();
+            Block block = event.getClickedBlock();
+            if(block.getBlockData() instanceof org.bukkit.block.data.Powerable) {
+                player.sendMessage(block.getType().toString());
+            }
             TeleportChecker(player, event.getClickedBlock(), event);
         }
     }
@@ -110,11 +139,20 @@ public class BlockChecker implements Listener {
     public void TeleportChecker(Player player) {
         Location loc = player.getLocation();
 
-        if(CoreChecker(loc) && LightChecker(loc)) {
+        boolean isTeleporter = CoreChecker(loc);
+        boolean isElevator = ElevatorChecker(loc);
+
+
+        if((isTeleporter || isElevator) && LightChecker(loc)) {
             // Put activation conditions here:
             try {
-                Vector3d tppos = BlockCalculator(player, true);
                 //player.sendMessage("Teleported"); // Teleportation Debugging
+                Vector3d tppos = new Vector3d(0,0,0);
+                if(isTeleporter) {
+                    tppos = BlockCalculator(player, true);
+                } else if(isElevator) {
+
+                }
                 player.teleport(new Location(player.getWorld(), tppos.x, tppos.y, tppos.z,
                         player.getLocation().getYaw(),
                         player.getLocation().getPitch())
@@ -133,7 +171,7 @@ public class BlockChecker implements Listener {
         Location loc = player.getLocation();
         Block lightblock = new Location(loc.getWorld(), loc.getX(), loc.getY()-1, loc.getZ()).getBlock();
 
-        if(CoreChecker(loc) && LightChecker(loc) && lightblock.getType().equals(clickedblock.getType())) {
+        if((CoreChecker(loc) || ElevatorChecker(loc)) && LightChecker(loc) && lightblock.getType().equals(clickedblock.getType())) {
             // Put activation conditions here:
             try {
                 event.setCancelled(true);
@@ -154,8 +192,7 @@ public class BlockChecker implements Listener {
 
     boolean CoreChecker(Location loc) {
         int checkCount = 0;
-        Location temp = new Location(loc.getWorld(),loc.getX(),loc.getY(),loc.getZ());
-        temp.setY(temp.getY() - 1);
+        Location temp = new Location(loc.getWorld(),loc.getX(),loc.getY()-1,loc.getZ());
         for (String s : teleporterArrangement) {
             temp.setY(temp.getY() - 1); // Check the next block down
             Block block = temp.getBlock();
@@ -165,6 +202,12 @@ public class BlockChecker implements Listener {
 
         }
         return checkCount == teleporterArrangement.length;
+    }
+
+    boolean ElevatorChecker(Location loc) {
+        Location temp = new Location(loc.getWorld(),loc.getX(),loc.getY()-2,loc.getZ());
+
+        return false;
     }
 
     boolean LightChecker(Location loc) {

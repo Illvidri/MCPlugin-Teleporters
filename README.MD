@@ -101,16 +101,25 @@ for each Minecraft version.
 | v0.1.1         | 1.20.4             |
 
 ## Future Plans:
-- Number to Hex-Block Command (and vice versa)
+Sorted in order of priority:
 - Small Teleporter (Elevator)
+- Number to Hex-Block Command (and vice versa)
+- A teleporter identification item
+  - Allows the user to see details about the teleporter; coordinates, settings, etc.
+  - Has the purpose of helping avoid teleportation traps set by others
+  - Assists in debugging
+- Entity Teleportation
 - config.yml
   - For controlling the construction of the large teleporter or possible arrangements
   - For controlling the size of the large teleporter
   - For controlling the blocks used to represent the coordinates
   - For controlling the uppermost blocks (the light blocks)
-- Entity Teleportation
-- Cross-Dimension Teleportation (Might be too OP)
-- Possibly an item you can right-click the teleporter with to see information about the teleporter (to avoid teleportation traps set by others)
+Ideas for after v1.0.0:
+- Registering Teleporters and Teleporter Ownership
+- Command to allow/register certain players to use a specific teleporter
+  - Username checking
+  - Item checking
+  - Team/Faction checking
 
 ## Miscellaneous Nonsense:
 ### Lore (Excuses why I chose the arrangement (I made all of this up on the spot)):
