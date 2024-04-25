@@ -129,6 +129,7 @@ public class BlockChecker implements Listener {
         if(event.getAction()==Action.RIGHT_CLICK_BLOCK) {
             Player player = event.getPlayer();
             Block block = event.getClickedBlock();
+            assert block != null;
             if(block.getBlockData() instanceof org.bukkit.block.data.Powerable) {
                 player.sendMessage(block.getType().toString());
             }
@@ -144,26 +145,17 @@ public class BlockChecker implements Listener {
 
 
         if((isTeleporter || isElevator) && LightChecker(loc)) {
-            // Put activation conditions here:
             try {
-                //player.sendMessage("Teleported"); // Teleportation Debugging
                 Vector3d tppos = new Vector3d(0,0,0);
-                if(isTeleporter) {
-                    tppos = BlockCalculator(player, true);
-                } else if(isElevator) {
 
-                }
+                if(isTeleporter) tppos = BlockCalculator(player, true, false);
+                if(isElevator) tppos = BlockCalculator(player, true, true);
+
                 player.teleport(new Location(player.getWorld(), tppos.x, tppos.y, tppos.z,
                         player.getLocation().getYaw(),
                         player.getLocation().getPitch())
                 );
             } catch(RuntimeException ignored) {}
-        }
-        else {
-            // Put random debugging nonsense here:
-            loc = player.getLocation();
-            loc.setY(loc.getY()-1);
-            //player.sendMessage(hexBlockEncoder.valueOf("AIR").toString());
         }
     }
 
@@ -171,22 +163,22 @@ public class BlockChecker implements Listener {
         Location loc = player.getLocation();
         Block lightblock = new Location(loc.getWorld(), loc.getX(), loc.getY()-1, loc.getZ()).getBlock();
 
+        boolean isTeleporter = CoreChecker(loc);
+        boolean isElevator = ElevatorChecker(loc);
+
         if((CoreChecker(loc) || ElevatorChecker(loc)) && LightChecker(loc) && lightblock.getType().equals(clickedblock.getType())) {
-            // Put activation conditions here:
             try {
                 event.setCancelled(true);
-                Vector3d tppos = BlockCalculator(player, false);
-                //player.sendMessage("Teleported"); // Teleportation Debugging
+                Vector3d tppos = new Vector3d(0,0,0);
+
+                if(isTeleporter) tppos = BlockCalculator(player, false, false);
+                if(isElevator) tppos = BlockCalculator(player, false, true);
+
                 player.teleport(new Location(player.getWorld(), tppos.x, tppos.y, tppos.z,
                         player.getLocation().getYaw(),
                         player.getLocation().getPitch())
                 );
             } catch(RuntimeException ignored) {}
-        } else {
-            // Put random debugging nonsense here:
-            loc = player.getLocation();
-            loc.setY(loc.getY()-1);
-            //player.sendMessage(hexBlockEncoder.valueOf("AIR").toString());
         }
     }
 
@@ -204,10 +196,9 @@ public class BlockChecker implements Listener {
         return checkCount == teleporterArrangement.length;
     }
 
-    boolean ElevatorChecker(Location loc) {
+    boolean ElevatorChecker(Location loc) { // TODO: Make this work for all other elevator activators
         Location temp = new Location(loc.getWorld(),loc.getX(),loc.getY()-2,loc.getZ());
-
-        return false;
+        return temp.getBlock().getType().toString().equals("REDSTONE_TORCH");
     }
 
     boolean LightChecker(Location loc) {
@@ -216,8 +207,13 @@ public class BlockChecker implements Listener {
         return block.getLightLevel() == 15 && lights.contains(block.getType().toString()); // Count if the light block is of the above
     }
 
-    public Vector3d BlockCalculator(Player player, boolean forced) { // This method will calculate the target coordinates given by the teleporter construction
+    public Vector3d BlockCalculator(Player player, boolean forced, boolean elevator) { // This method will calculate the target coordinates given by the teleporter construction
         final Location playerloc = player.getLocation();
+        final int blockNum;
+        if(elevator) blockNum = 1;
+        else {
+            blockNum = CoordinateSize;
+        }
 
         double xcoord = 0;
         double ycoord = 0;
@@ -229,10 +225,18 @@ public class BlockChecker implements Listener {
         yenccoord = new StringBuilder();
         zenccoord = new StringBuilder();
 
-        fillEncodedString(new Location(playerloc.getWorld(), playerloc.getX(), playerloc.getY()-1, playerloc.getZ()-1), settingsval, false);
-        fillEncodedString(new Location(playerloc.getWorld(), playerloc.getX()+1, playerloc.getY()-1, playerloc.getZ()), xenccoord, true);
-        fillEncodedString(new Location(playerloc.getWorld(), playerloc.getX(), playerloc.getY()-1, playerloc.getZ()+1), yenccoord, true);
-        fillEncodedString(new Location(playerloc.getWorld(), playerloc.getX()-1, playerloc.getY()-1, playerloc.getZ()), zenccoord, true);
+        if(elevator) fillEncodedString(new Location(playerloc.getWorld(), playerloc.getX()+1, playerloc.getY()-1, playerloc.getZ()+1), settingsval, false, blockNum);
+        else fillEncodedString(new Location(playerloc.getWorld(), playerloc.getX(), playerloc.getY()-1, playerloc.getZ()-1), settingsval, false, blockNum);
+        fillEncodedString(new Location(playerloc.getWorld(), playerloc.getX()+1, playerloc.getY()-1, playerloc.getZ()), xenccoord, true, blockNum);
+        fillEncodedString(new Location(playerloc.getWorld(), playerloc.getX(), playerloc.getY()-1, playerloc.getZ()+1), yenccoord, true, blockNum);
+        fillEncodedString(new Location(playerloc.getWorld(), playerloc.getX()-1, playerloc.getY()-1, playerloc.getZ()), zenccoord, true, blockNum);
+        if(elevator) {
+            fillEncodedString(new Location(playerloc.getWorld(), playerloc.getX(), playerloc.getY()-1, playerloc.getZ()-1), settingsval, false, blockNum);
+            fillEncodedString(new Location(playerloc.getWorld(), playerloc.getX()-1, playerloc.getY()-1, playerloc.getZ()+1), settingsval, false, blockNum);
+            fillEncodedString(new Location(playerloc.getWorld(), playerloc.getX()+1, playerloc.getY()-1, playerloc.getZ()-1), settingsval, false, blockNum);
+            settingsval.insert(0, "F");
+            fillEncodedString(new Location(playerloc.getWorld(), playerloc.getX()-1, playerloc.getY()-1, playerloc.getZ()-1), settingsval, false, blockNum);
+        }
 
         settingsval.reverse();
         if(!settingsval.substring(5,6).equals("F")) {
@@ -251,7 +255,6 @@ public class BlockChecker implements Listener {
         if(!forced && !settingsval.substring(3,4).equals("0")) throw new RuntimeException("Not a Forced Teleport");
         else if (forced && !settingsval.substring(3,4).equals("F")) throw new RuntimeException("A Forced Teleport");
 
-
         try {
             xcoord *= Integer.parseInt(xenccoord.toString(), 16);
             ycoord *= Integer.parseInt(yenccoord.toString(), 16);
@@ -268,12 +271,11 @@ public class BlockChecker implements Listener {
             zcoord = 0;
         }
 
-        //player.sendMessage("("+xcoord+", "+ycoord+", "+zcoord+")"); // Coordinate Debugging
         return new Vector3d(xcoord,ycoord,zcoord);
     }
 
-    void fillEncodedString(Location loc, StringBuilder target, boolean haltOnFail) {
-        for(int i = 0; i < CoordinateSize; i++) {
+    void fillEncodedString(Location loc, StringBuilder target, boolean haltOnFail, int blockNum) {
+        for(int i = 0; i < blockNum; i++) {
             loc.setY(loc.getY()-1);
             try {
                 target.insert(0, hexBlockEncoder.valueOf(loc.getBlock().getType().toString()).val);
