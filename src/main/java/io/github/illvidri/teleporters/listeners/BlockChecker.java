@@ -1,5 +1,6 @@
 package io.github.illvidri.teleporters.listeners;
 
+import org.bukkit.block.data.Lightable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -22,7 +23,7 @@ public class BlockChecker implements Listener {
             "CUT_COPPER_SLAB"
     };
 
-    enum elevatorPowerSources {
+    enum elevatorCores {
         @SuppressWarnings({"unused"})
         LAVA_CAULDRON,
         @SuppressWarnings({"unused"})
@@ -37,7 +38,7 @@ public class BlockChecker implements Listener {
         WAXED_COPPER_BULB;
         public static boolean contains(String val) {
             try {
-                lights.valueOf(val);
+                elevatorCores.valueOf(val);
                 return true;
             } catch (Exception e) {
                 return false;
@@ -116,8 +117,6 @@ public class BlockChecker implements Listener {
         }
     }
 
-    enum TeleporterType {LARGE, ELEVATOR};
-
     @EventHandler
     public void playerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
@@ -166,7 +165,7 @@ public class BlockChecker implements Listener {
         boolean isTeleporter = CoreChecker(loc);
         boolean isElevator = ElevatorChecker(loc);
 
-        if((CoreChecker(loc) || ElevatorChecker(loc)) && LightChecker(loc) && lightblock.getType().equals(clickedblock.getType())) {
+        if((isTeleporter || isElevator) && LightChecker(loc) && lightblock.getType().equals(clickedblock.getType())) {
             try {
                 event.setCancelled(true);
                 Vector3d tppos = new Vector3d(0,0,0);
@@ -196,9 +195,15 @@ public class BlockChecker implements Listener {
         return checkCount == teleporterArrangement.length;
     }
 
-    boolean ElevatorChecker(Location loc) { // TODO: Make this work for all other elevator activators
+    boolean ElevatorChecker(Location loc) {
         Location temp = new Location(loc.getWorld(),loc.getX(),loc.getY()-2,loc.getZ());
-        return temp.getBlock().getType().toString().equals("REDSTONE_TORCH");
+        boolean isElevatorCoreBlock = elevatorCores.contains(temp.getBlock().getType().toString());
+        if(isElevatorCoreBlock) {
+            if (temp.getBlock().getBlockData() instanceof Lightable) {
+                return ((Lightable) temp.getBlock().getBlockData()).isLit();
+            } else return true;
+        }
+        return false;
     }
 
     boolean LightChecker(Location loc) {

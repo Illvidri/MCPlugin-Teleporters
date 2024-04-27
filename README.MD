@@ -1,4 +1,4 @@
-# Minecraft Plugin: Teleporters | Latest Version: 0.1.1
+# Minecraft Plugin: Teleporters | Latest Version: 0.2.0
 ### Made by Illvidri
 
 | Table of Contents:                                     |
@@ -16,15 +16,6 @@ The coordinates can be input using stained-glass blocks in the correct configura
 
 ## Teleporter Construction:
 (Pictures yet to be added)
-
-The Core:
-- light block (Beacon, Sea Lantern, Glowstone, Lit Redstone Lamp, Shroomlight, Any Froglight)
-- Lodestone
-- Redstone Block
-- Downwards Facing Piston
-- Hopper
-- Crying Obsidian
-- Cut Copper Slab (Can not be waxed, and can not be oxidized)
 
 ### Coordinate Determiners:
 It is in base 16, so pull up a calculator if you aren't used to converting from b10 to b16
@@ -53,7 +44,17 @@ Example: 0x4A6 (White, Green, Magenta (Bottom to Top)) = 1190; (This example doe
 Additionally, tinted glass represents negative for the coordinate signs, and a boolean false;
 glass represents positive for the coordinate signs, and a boolean true
 
-### Glass Arrangement:
+### Large Teleporters:
+The Core:
+- light block (Beacon, Sea Lantern, Glowstone, Lit Redstone Lamp, Shroomlight, Any Froglight)
+- Lodestone
+- Redstone Block
+- Downwards Facing Piston
+- Hopper
+- Crying Obsidian
+- Cut Copper Slab (Can not be waxed, and can not be oxidized)
+
+#### Glass Arrangement:
 The x-coordinate blocks are placed on the East side
 
 The y-coordinate blocks are placed on the South side
@@ -92,17 +93,38 @@ into the void. This is an intended feature.
 
 **Sixth Block**: Activity: Glass is active; Any other block is inactive
 
+### Elevator Teleporters:
+A smaller teleporter, but with limited range (always teleports relative to the player)
+The teleportation range is a 33x33x33 block volume
+It is made with a light block, and a 'power' block (Lava Cauldron, Redstone Block, Redstone Torch, Redstone Lamp)
+
+#### Glass Arrangement:
+The x-coordinate block is placed on the East side
+
+The y-coordinate block is placed on the South side
+
+The z-coordinate block is placed on the West side
+
+The x-coordinate sign block is on the Southeast side
+
+The y-coordinate sign block is on the North side
+
+The z-coordinate sign block in on the Southwest side
+
+The activation block is on the Northwest side
+
+The Northeast block controls if the teleporter is passive or active (see [Settings](#Settings))
+
 ## Compatibilities:
 This list only includes the most up-to-date plugin version
 for each Minecraft version.
 
 | Plugin Version | Minecraft Versions |
 |----------------|--------------------|
-| v0.1.1         | 1.20.4             |
+| v0.2.0         | 1.20.4             |
 
 ## Future Plans:
 Sorted in order of priority:
-- Small Teleporter (Elevator)
 - Number to Hex-Block Command (and vice versa)
 - A teleporter identification item
   - Allows the user to see details about the teleporter; coordinates, settings, etc.

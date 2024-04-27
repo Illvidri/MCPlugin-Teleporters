@@ -6,7 +6,7 @@
 
     <groupId>io.github.illvidri</groupId>
     <artifactId>Teleporters</artifactId>
-    <version>0.2.0a</version>
+    <version>0.2.0</version>
     <packaging>jar</packaging>
 
     <name>Teleporters</name>
