@@ -136,6 +136,7 @@ Sorted in order of priority:
   - For controlling the size of the large teleporter
   - For controlling the blocks used to represent the coordinates
   - For controlling the uppermost blocks (the light blocks)
+
 Ideas for after v1.0.0:
 - Registering Teleporters and Teleporter Ownership
 - Command to allow/register certain players to use a specific teleporter
